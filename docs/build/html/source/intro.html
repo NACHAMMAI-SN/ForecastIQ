@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P2KLF8302E"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-P2KLF8302E');
+    </script>
+    
+    <title>Intro &#8212; AutoTS 1.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=a4fa0645" />
+    <script src="../_static/documentation_options.js?v=292eb321"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorial" href="tutorial.html" />
+    <link rel="prev" title="AutoTS" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="intro">
+<h1>Intro<a class="headerlink" href="#intro" title="Link to this heading">¶</a></h1>
+</section>
+<section id="autots">
+<h1>AutoTS<a class="headerlink" href="#autots" title="Link to this heading">¶</a></h1>
+<p><span class="raw-html-m2r"><img src="/img/autots_1280.png" width="400" height="184" title="AutoTS Logo"></span></p>
+<p>AutoTS is a time series package for Python designed for rapidly deploying high-accuracy forecasts at scale.</p>
+<p>In 2023, AutoTS won in the M6 forecasting competition, delivering the highest performance investment decisions across 12 months of stock market forecasting.</p>
+<p>There are dozens of forecasting models usable in the <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> style of <code class="docutils literal notranslate"><span class="pre">.fit()</span></code> and <code class="docutils literal notranslate"><span class="pre">.predict()</span></code>.
+These includes naive, statistical, machine learning, and deep learning models.
+Additionally, there are over 30 time series specific transforms usable in the <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> style of <code class="docutils literal notranslate"><span class="pre">.fit()</span></code>, <code class="docutils literal notranslate"><span class="pre">.transform()</span></code> and <code class="docutils literal notranslate"><span class="pre">.inverse_transform()</span></code>.
+All of these function directly on Pandas Dataframes, without the need for conversion to proprietary objects.</p>
+<p>All models support forecasting multivariate (multiple time series) outputs and also support probabilistic (upper/lower bound) forecasts.
+Most models can readily scale to tens and even hundreds of thousands of input series.
+Many models also support passing in user-defined exogenous regressors.</p>
+<p>These models are all designed for integration in an AutoML feature search which automatically finds the best models, preprocessing, and ensembling for a given dataset through genetic algorithms.</p>
+<p>Horizontal and mosaic style ensembles are the flagship ensembling types, allowing each series to receive the most accurate possible models while still maintaining scalability.</p>
+<p>A combination of metrics and cross-validation options, the ability to apply subsets and weighting, regressor generation tools, simulation forecasting mode, event risk forecasting, live datasets, template import and export, plotting, and a collection of data shaping parameters round out the available feature set.</p>
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/winedarksea/AutoTS#installation">Installation</a></p></li>
+<li><p><a class="reference external" href="https://github.com/winedarksea/AutoTS#basic-use">Basic Use</a></p></li>
+<li><p><a class="reference external" href="https://github.com/winedarksea/AutoTS#tips-for-speed-and-large-data">Tips for Speed and Large Data</a></p></li>
+<li><p><a class="reference external" href="https://github.com/winedarksea/AutoTS#autots-process">Flowchart</a></p></li>
+<li><p>Extended Tutorial <a class="reference external" href="https://github.com/winedarksea/AutoTS/blob/master/extended_tutorial.md">GitHub</a> or <a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html">Docs</a></p></li>
+<li><p><a class="reference external" href="https://github.com/winedarksea/AutoTS/blob/master/production_example.py">Production Example</a></p></li>
+</ul>
+</section>
+<section id="id1">
+<h2>Installation<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">autots</span>
+</pre></div>
+</div>
+<p>This includes dependencies for basic models, but <a class="reference external" href="https://github.com/winedarksea/AutoTS/blob/master/extended_tutorial.md#installation-and-dependency-versioning">additonal packages</a> are required for some models and methods.</p>
+<p>Be advised there are several other projects that have chosen similar names, so make sure you are on the right AutoTS code, papers, and documentation.</p>
+</section>
+<section id="id2">
+<h2>Basic Use<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>Input data for AutoTS is expected to come in either a <em>long</em> or a <em>wide</em> format:</p>
+<ul class="simple">
+<li><p>The <em>wide</em> format is a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> with a <code class="docutils literal notranslate"><span class="pre">pandas.DatetimeIndex</span></code> and each column a distinct series.</p></li>
+<li><p>The <em>long</em> format has three columns:</p>
+<ul>
+<li><p>Date (ideally already in pandas-recognized <code class="docutils literal notranslate"><span class="pre">datetime</span></code> format)</p></li>
+<li><p>Series ID. For a single time series, series_id can be <code class="docutils literal notranslate"><span class="pre">=</span> <span class="pre">None</span></code>.</p></li>
+<li><p>Value</p></li>
+</ul>
+</li>
+<li><p>For <em>long</em> data, the column name for each of these is passed to <code class="docutils literal notranslate"><span class="pre">.fit()</span></code> as <code class="docutils literal notranslate"><span class="pre">date_col</span></code>, <code class="docutils literal notranslate"><span class="pre">id_col</span></code>, and <code class="docutils literal notranslate"><span class="pre">value_col</span></code>. No parameters are needed for <em>wide</em> data.</p></li>
+</ul>
+<p>Lower-level functions are only designed for <code class="docutils literal notranslate"><span class="pre">wide</span></code> style data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># also load: _hourly, _monthly, _weekly, _yearly, or _live_daily</span>
+<span class="kn">from</span> <span class="nn">autots</span> <span class="kn">import</span> <span class="n">AutoTS</span><span class="p">,</span> <span class="n">load_daily</span>
+
+<span class="c1"># sample datasets can be used in either of the long or wide import shapes</span>
+<span class="n">long</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">load_daily</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="n">long</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoTS</span><span class="p">(</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span>
+    <span class="n">frequency</span><span class="o">=</span><span class="s2">&quot;infer&quot;</span><span class="p">,</span>
+    <span class="n">prediction_interval</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+    <span class="n">ensemble</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_list</span><span class="o">=</span><span class="s2">&quot;superfast&quot;</span><span class="p">,</span>  <span class="c1"># &quot;fast&quot;, &quot;default&quot;, &quot;fast_parallel&quot;</span>
+    <span class="n">transformer_list</span><span class="o">=</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span>  <span class="c1"># &quot;superfast&quot;,</span>
+    <span class="n">drop_most_recent</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_generations</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">num_validations</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">validation_method</span><span class="o">=</span><span class="s2">&quot;backwards&quot;</span>
+<span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">date_col</span><span class="o">=</span><span class="s1">&#39;datetime&#39;</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">value_col</span><span class="o">=</span><span class="s1">&#39;value&#39;</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">id_col</span><span class="o">=</span><span class="s1">&#39;series_id&#39;</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="c1"># plot a sample</span>
+<span class="n">prediction</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">df_wide_numeric</span><span class="p">,</span>
+                <span class="n">series</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">df_wide_numeric</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">start_date</span><span class="o">=</span><span class="s2">&quot;2019-01-01&quot;</span><span class="p">)</span>
+<span class="c1"># Print the details of the best model</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+<span class="c1"># point forecasts dataframe</span>
+<span class="n">forecasts_df</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">forecast</span>
+<span class="c1"># upper and lower forecasts</span>
+<span class="n">forecasts_up</span><span class="p">,</span> <span class="n">forecasts_low</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">upper_forecast</span><span class="p">,</span> <span class="n">prediction</span><span class="o">.</span><span class="n">lower_forecast</span>
+
+<span class="c1"># accuracy of all tried model results</span>
+<span class="n">model_results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">()</span>
+<span class="c1"># and aggregated from cross validation</span>
+<span class="n">validation_results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">results</span><span class="p">(</span><span class="s2">&quot;validation&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The lower-level API, in particular the large section of time series transformers in the scikit-learn style, can also be utilized independently from the AutoML framework.</p>
+<p>Check out <a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html">extended_tutorial.md</a> for a more detailed guide to features.</p>
+<p>Also take a look at the <a class="reference external" href="https://github.com/winedarksea/AutoTS/blob/master/production_example.py">production_example.py</a></p>
+</section>
+<section id="id3">
+<h2>Tips for Speed and Large Data:<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Use appropriate model lists, especially the predefined lists:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">superfast</span></code> (simple naive models) and <code class="docutils literal notranslate"><span class="pre">fast</span></code> (more complex but still faster models, optimized for many series)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fast_parallel</span></code> (a combination of <code class="docutils literal notranslate"><span class="pre">fast</span></code> and <code class="docutils literal notranslate"><span class="pre">parallel</span></code>) or <code class="docutils literal notranslate"><span class="pre">parallel</span></code>, given many CPU cores are available</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> usually gets pretty close with <code class="docutils literal notranslate"><span class="pre">='auto'</span></code> but adjust as necessary for the environment</p></li>
+</ul>
+</li>
+<li><p>‘scalable’ is the best list to avoid crashing when many series are present. There is also a transformer_list = ‘scalable’</p></li>
+<li><p>see a dict of predefined lists (some defined for internal use) with <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">autots.models.model_list</span> <span class="pre">import</span> <span class="pre">model_lists</span></code></p></li>
+</ul>
+</li>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">subset</span></code> parameter when there are many similar series, <code class="docutils literal notranslate"><span class="pre">subset=100</span></code> will often generalize well for tens of thousands of similar series.</p>
+<ul>
+<li><p>if using <code class="docutils literal notranslate"><span class="pre">subset</span></code>, passing <code class="docutils literal notranslate"><span class="pre">weights</span></code> for series will weight subset selection towards higher priority series.</p></li>
+<li><p>if limited by RAM, it can be distributed by running multiple instances of AutoTS on different batches of data, having first imported a template pretrained as a starting point for all.</p></li>
+</ul>
+</li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">model_interrupt=True</span></code> to skip only the current model when you hit <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code>. Tap <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code> a second time within 1.5 seconds to end the entire run, or pass something like <code class="docutils literal notranslate"><span class="pre">model_interrupt={&quot;mode&quot;:</span> <span class="pre">&quot;skip&quot;,</span> <span class="pre">&quot;double_press_window&quot;:</span> <span class="pre">1.2}</span></code> to tighten/loosen the window.</p></li>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">result_file</span></code> method of <code class="docutils literal notranslate"><span class="pre">.fit()</span></code> which will save progress after each generation - helpful to save progress if a long training is being done. Use <code class="docutils literal notranslate"><span class="pre">import_results</span></code> to recover.</p></li>
+<li><p>While Transformations are pretty fast, setting <code class="docutils literal notranslate"><span class="pre">transformer_max_depth</span></code> to a lower number (say, 2) will increase speed. Also utilize <code class="docutils literal notranslate"><span class="pre">transformer_list</span></code> == ‘fast’ or ‘superfast’.</p></li>
+<li><p>Check out <a class="reference external" href="https://github.com/winedarksea/AutoTS/discussions/76">this example</a> of using AutoTS with pandas UDF.</p></li>
+<li><p>Ensembles are obviously slower to predict because they run many models, ‘distance’ models 2x slower, and ‘simple’ models 3x-5x slower.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ensemble='horizontal-max'</span></code> with <code class="docutils literal notranslate"><span class="pre">model_list='no_shared_fast'</span></code> can scale relatively well given many cpu cores because each model is only run on the series it is needed for.</p></li>
+</ul>
+</li>
+<li><p>Reducing <code class="docutils literal notranslate"><span class="pre">num_validations</span></code> and <code class="docutils literal notranslate"><span class="pre">models_to_validate</span></code> will decrease runtime but may lead to poorer model selections.</p></li>
+<li><p>For datasets with many records, upsampling (for example, from daily to monthly frequency forecasts) can reduce training time if appropriate.</p>
+<ul>
+<li><p>this can be done by adjusting <code class="docutils literal notranslate"><span class="pre">frequency</span></code> and <code class="docutils literal notranslate"><span class="pre">aggfunc</span></code> but is probably best done before passing data into AutoTS.</p></li>
+</ul>
+</li>
+<li><p>It will be faster if NaN’s are already filled. If a search for optimal NaN fill method is not required, then fill any NaN with a satisfactory method before passing to class.</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">runtime_weighting</span></code> in <code class="docutils literal notranslate"><span class="pre">metric_weighting</span></code> to a higher value. This will guide the search towards faster models, although it may come at the expense of accuracy.</p></li>
+<li><p>Memory shortage is the most common cause of random process/kernel crashes. Try testing a data subset and using a different model list if issues occur. Please also report crashes if found to be linked to a specific set of model parameters (not AutoTS parameters but the underlying forecasting model params). Also crashes vary significantly by setup such as underlying linpack/blas so seeing crash differences between environments can be expected.</p></li>
+</ul>
+</section>
+<section id="mcp-server">
+<h2>MCP Server<a class="headerlink" href="#mcp-server" title="Link to this heading">¶</a></h2>
+<p>See the README.md in ./autots/mcp. Note install with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">autots[mcp]</span></code> for full dependencies, or the equivalent <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">autots-mcp</span></code>.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;autots&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;autots-mcp&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>mcp-name: io.github.winedarksea/AutoTS</p>
+</section>
+<section id="how-to-contribute">
+<h2>How to Contribute:<a class="headerlink" href="#how-to-contribute" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Give feedback on where you find the documentation confusing</p></li>
+<li><p>Use AutoTS and…</p>
+<ul>
+<li><p>Report errors and request features by adding Issues on GitHub</p></li>
+<li><p>Posting the top model templates for your data (to help improve the starting templates)</p></li>
+<li><p>Feel free to recommend different search grid parameters for your favorite models</p></li>
+</ul>
+</li>
+<li><p>And, of course, contributing to the codebase directly on GitHub.</p></li>
+</ul>
+</section>
+<section id="autots-process">
+<h2>AutoTS Process<a class="headerlink" href="#autots-process" title="Link to this heading">¶</a></h2>
+<div class="highlight-mermaid notranslate"><div class="highlight"><pre><span></span>flowchart TD
+    A[Initiate AutoTS Model] --&gt; B[Import Template]
+    B --&gt; C[Load Data]
+    C --&gt; D[Split Data Into Initial Train/Test Holdout]
+    D --&gt; E[Run Initial Template Models]
+    E --&gt; F[Evaluate Accuracy Metrics on Results]
+    F --&gt; G[Generate Score from Accuracy Metrics]
+    G --&gt; H{Max Generations Reached or Timeout?}
+
+    H --&gt;|No| I[Evaluate All Previous Templates]
+    I --&gt; J[Genetic Algorithm Combines Best Results and New Random Parameters into New Template]
+    J --&gt; K[Run New Template Models and Evaluate]
+    K --&gt; G
+
+    H --&gt;|Yes| L[Select Best Models by Score for Validation Template]
+    L --&gt; M[Run Validation Template on Additional Holdouts]
+    M --&gt; N[Evaluate and Score Validation Results]
+    N --&gt; O{Create Ensembles?}
+
+    O --&gt;|Yes| P[Generate Ensembles from Validation Results]
+    P --&gt; Q[Run Ensembles Through Validation]
+    Q --&gt; N
+
+    O --&gt;|No| R[Export Best Models Template]
+    R --&gt; S[Select Single Best Model]
+    S --&gt; T[Generate Future Time Forecast]
+    T --&gt; U[Visualize Results]
+
+    R --&gt; B[Import Best Models Template]
+</pre></div>
+</div>
+</section>
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Link to this heading">¶</a></h2>
+<p>If you wish to cite AutoTS in an academic work, the following paper may be used.</p>
+<p>Colin Catlin,
+Adaptive forecasting in dynamic markets: An evaluation of AutoTS within the M6 competition,
+International Journal of Forecasting,
+Volume 41, Issue 4, 2025, Pages 1485-1493, ISSN 0169-2070,
+<a class="reference external" href="https://doi.org/10.1016/j.ijforecast.2025.08.004">https://doi.org/10.1016/j.ijforecast.2025.08.004</a>.</p>
+<p><em>Also known as Project CATS (Catlin’s Automated Time Series) hence the logo.</em></p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/autots_logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">Automated Forecasting</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=winedarksea&repo=autots&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#autots">AutoTS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Basic Use</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">Tips for Speed and Large Data:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mcp-server">MCP Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-contribute">How to Contribute:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#autots-process">AutoTS Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#citation">Citation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html#extended-tutorial">Extended Tutorial</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">autots</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">AutoTS</a></li>
+      <li>Next: <a href="tutorial.html" title="next chapter">Tutorial</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2026, Colin Catlin.
+      
+      |
+      <a href="../_sources/source/intro.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P2KLF8302E"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-P2KLF8302E');
+    </script>
+    
+    <title>Tutorial &#8212; AutoTS 1.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=a4fa0645" />
+    <script src="../_static/documentation_options.js?v=292eb321"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="autots" href="modules.html" />
+    <link rel="prev" title="Intro" href="intro.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading">¶</a></h1>
+</section>
+<section id="extended-tutorial">
+<h1>Extended Tutorial<a class="headerlink" href="#extended-tutorial" title="Link to this heading">¶</a></h1>
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#id1">A Simple Example</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#id2">Validation and Cross Validation</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#id3">Another Example</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#id4">Model Lists</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#deployment-and-template-import-export">Deployment</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#id5">Running Just One Model</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#id6">Metrics</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#ensembles">Ensembles</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#installation-and-dependency-versioning">Installation</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#caveats-and-advice">Caveats</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#adding-regressors-and-other-information">Adding Regressors</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#id8">Simulation Forecasting</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#id9">Event Risk Forecasting</a></p></li>
+<li><p><a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/tutorial.html#id10">Models</a></p></li>
+</ul>
+<section id="id1">
+<h3>A simple example<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># also: _hourly, _daily, _weekly, or _yearly</span>
+<span class="kn">from</span> <span class="nn">autots.datasets</span> <span class="kn">import</span> <span class="n">load_monthly</span>
+
+<span class="n">df_long</span> <span class="o">=</span> <span class="n">load_monthly</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">autots</span> <span class="kn">import</span> <span class="n">AutoTS</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoTS</span><span class="p">(</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;infer&#39;</span><span class="p">,</span>
+    <span class="n">ensemble</span><span class="o">=</span><span class="s1">&#39;simple&#39;</span><span class="p">,</span>
+    <span class="n">max_generations</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">num_validations</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df_long</span><span class="p">,</span> <span class="n">date_col</span><span class="o">=</span><span class="s1">&#39;datetime&#39;</span><span class="p">,</span> <span class="n">value_col</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">id_col</span><span class="o">=</span><span class="s1">&#39;series_id&#39;</span><span class="p">)</span>
+
+<span class="c1"># Print the description of the best model</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="import-of-data">
+<h4>Import of data<a class="headerlink" href="#import-of-data" title="Link to this heading">¶</a></h4>
+<p>There are two shapes/styles of <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> which are accepted.
+The first is <em>long</em> data, like that out of an aggregated sales-transaction table containing three columns identified to <code class="docutils literal notranslate"><span class="pre">.fit()</span></code> as <code class="docutils literal notranslate"><span class="pre">date_col</span> <span class="pre">{pd.Datetime},</span> <span class="pre">value_col</span> <span class="pre">{the</span> <span class="pre">numeric</span> <span class="pre">or</span> <span class="pre">categorical</span> <span class="pre">data</span> <span class="pre">of</span> <span class="pre">interest},</span> <span class="pre">and</span> <span class="pre">id_col</span> <span class="pre">{id</span> <span class="pre">string,</span> <span class="pre">if</span> <span class="pre">multiple</span> <span class="pre">series</span> <span class="pre">are</span> <span class="pre">provided}</span></code>.
+Alternatively, the data may be in a <em>wide</em> format where the index is a <code class="docutils literal notranslate"><span class="pre">pandas.DatetimeIndex</span></code>, and each column is a distinct data series.</p>
+<p>If horizontal style ensembles are used, series_ids/column names will be coerced to strings.</p>
+</section>
+<section id="you-can-tailor-the-process-in-a-few-ways">
+<h4>You can tailor the process in a few ways…<a class="headerlink" href="#you-can-tailor-the-process-in-a-few-ways" title="Link to this heading">¶</a></h4>
+<p>The simplest way to improve accuracy is to increase the number of generations <code class="docutils literal notranslate"><span class="pre">max_generations=15</span></code>. Each generation tries new models, taking additional time but improving the accuracy. The nature of genetic algorithms, however, means there is no consistent improvement for each generation, and large number of generations will often only result in minimal performance gains.</p>
+<p>Another approach that may improve accuracy is to set <code class="docutils literal notranslate"><span class="pre">ensemble='all'</span></code>. Ensemble parameter expects a single string, and can for example be <code class="docutils literal notranslate"><span class="pre">'simple,dist'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'horizontal'</span></code>. As this means storing more details of every model, this takes more time and memory.</p>
+<p>A handy parameter for when your data is expected to always be 0 or greater (such as unit sales) is to set <code class="docutils literal notranslate"><span class="pre">no_negatives=True</span></code>. This forces forecasts to be greater than or equal to 0.</p>
+<p>Another convenience function is <code class="docutils literal notranslate"><span class="pre">drop_most_recent=1</span></code> specifing the number of most recent periods to drop. This can be handy with monthly data, where often the most recent month is incomplete.
+<code class="docutils literal notranslate"><span class="pre">drop_data_older_than_periods</span></code> provides similar functionality but drops the oldest data to speed up the process on large datasets.
+<code class="docutils literal notranslate"><span class="pre">remove_leading_zeroes=True</span></code> is useful for data where leading zeroes represent a process which has not yet started.</p>
+<p>When working with many time series, it can be helpful to take advantage of <code class="docutils literal notranslate"><span class="pre">subset=100</span></code>. Subset specifies the interger number of time series to test models on, and can be useful with many related time series (1000’s of customer’s sales). Usually the best model on a 100 related time series is very close to that tested on many thousands (or more) of series.</p>
+<p>Subset takes advantage of weighting, more highly-weighted series are more likely to be selected. Weighting is used with multiple time series to tell the evaluator which series are most important. Series weights are assumed to all be equal to 1, values need only be passed in when a value other than 1 is desired.
+Note for weighting, larger weights = more important.</p>
+<p>Probably the most likely thing to cause trouble is having a lot of NaN/missing data. Especially a lot of missing data in the most recent available data.
+Using appropriate cross validation (<code class="docutils literal notranslate"><span class="pre">backwards</span></code> especially if NaN is common in older data but not recent data) can help.
+Dropping series which are mostly missing, or using <code class="docutils literal notranslate"><span class="pre">prefill_na=0</span></code> (or other value) can also help.</p>
+</section>
+</section>
+<section id="what-to-worry-about">
+<h3>What to Worry About<a class="headerlink" href="#what-to-worry-about" title="Link to this heading">¶</a></h3>
+<p>There are some basic things to beware of that can commonly lead to poor results:</p>
+<ol class="arabic simple">
+<li><p>Bad data (sudden drops or missing values) in the <em>most recent</em> data is the single most common cause of bad forecasts here. As many models use the most recent data as a jumping off point, error in the most recent data points can have an oversized effect on forecasts. Also remove all time series that are entirely NaN or entirely zero.</p></li>
+<li><p>Misrepresentative cross-validation samples. Models are chosen on performance in cross validation. If the validations don’t accurately represent the series, a poor model may be chosen. Choose a good method and as many validations as possible.</p></li>
+<li><p>Anomalies that won’t be repeated. Manual anomaly removal can be more effective than any automatic methods. Along with this, beware of a changing pattern of NaN occurrences, as learned FillNA may not longer apply.</p></li>
+<li><p>Artifical historical events, a simple example being sales promotions. Use of regressors is the most common method for dealing with this and may be critical for modeling these types of events.</p></li>
+</ol>
+<p>What you don’t need to do before the automated forecasting is any typical preprocessing. It is best to leave it up to the model selection process to choose, as different models do better with different types of preprocessing.</p>
+<p>One of the most common causes of failures for loading a template on a new dataset is models failing on series that are too short (or essentially all missing). Filter out series that are too new or have been discontinued, before proceeding.</p>
+</section>
+<section id="id2">
+<h3>Validation and Cross Validation<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<p>Cross validation helps assure that the optimal model is stable over the dynamics of a time series.
+Cross validation can be tricky in time series data due to the necessity of preventing data leakage from future data points.</p>
+<p>Firstly, all models are initially validated on the most recent piece of data. This is done because the most recent data will generally most closely resemble the forecast future.
+With very small datasets, there may be not be enough data for cross validation, in which case <code class="docutils literal notranslate"><span class="pre">num_validations</span></code> may be set to 0. This can also speed up quick tests.
+Note that when <code class="docutils literal notranslate"><span class="pre">num_validations=0</span></code> <em>one evaluation</em> is still run. It’s just not cross validation. <code class="docutils literal notranslate"><span class="pre">num_validations</span></code> is the number of <strong>cross</strong> validations to be done in addition.
+In general, the safest approach is to have as many validations as possible, as long as there is sufficient data for it.</p>
+<p>Here are the available methods:</p>
+<p><strong>Backwards</strong> cross validation is the safest method and works backwards from the most recent data. First the most recent forecast_length samples are taken, then the next most recent forecast_length samples, and so on. This makes it more ideal for smaller or fast-changing datasets.</p>
+<p><strong>Even</strong> cross validation slices the data into equal chunks. For example, <code class="docutils literal notranslate"><span class="pre">num_validations=3</span></code> would split the data into equal, progressive thirds (less the original validation sample). The final validation results would then include four pieces, the results on the three cross validation samples as well as the original validation sample.</p>
+<p><strong>Seasonal</strong> validation is supplied as <code class="docutils literal notranslate"><span class="pre">'seasonal</span> <span class="pre">n'</span></code> ie <code class="docutils literal notranslate"><span class="pre">'seasonal</span> <span class="pre">364'</span></code>. This is a variation on <code class="docutils literal notranslate"><span class="pre">backwards</span></code> validation and offers the best performance of all validation methods if an appropriate period is supplied.
+It trains on the most recent data as usual, then valdations are <code class="docutils literal notranslate"><span class="pre">n</span></code> periods back from the datetime of the forecast would be.
+For example with daily data, forecasting for a month ahead, and <code class="docutils literal notranslate"><span class="pre">n=364</span></code>, the first test might be on May 2021, with validation on June 2020 and June 2019, the final forecast then of June 2021.</p>
+<p><strong>Similarity</strong> automatically finds the data sections most similar to the most recent data that will be used for prediction. This is the best general purpose choice but currently can be sensitive to messy data.</p>
+<p><strong>Custom</strong> allows validations of any type. If used, .fit() needs <code class="docutils literal notranslate"><span class="pre">validation_indexes</span></code> passed - a list of pd.DatetimeIndex’s, tail of forecast_length of each is used as test (which should be of the same length as <code class="docutils literal notranslate"><span class="pre">num_validations</span></code> + 1).</p>
+<p><code class="docutils literal notranslate"><span class="pre">backwards</span></code>, <code class="docutils literal notranslate"><span class="pre">even</span></code> and <code class="docutils literal notranslate"><span class="pre">seasonal</span></code> validation all perform initial evaluation on the most recent split of data. <code class="docutils literal notranslate"><span class="pre">custom</span></code> performs initial evaluation on the first index in the list provided, while <code class="docutils literal notranslate"><span class="pre">similarity</span></code> acts on the closest distance segment first.</p>
+<p><code class="docutils literal notranslate"><span class="pre">mixed_length</span></code> uses different forecast_length values simultaneously. This can also be achieved with <code class="docutils literal notranslate"><span class="pre">custom</span></code> and <code class="docutils literal notranslate"><span class="pre">validation_indexes</span></code> passed as a list of tuples <code class="docutils literal notranslate"><span class="pre">[(train_index1,</span> <span class="pre">test_index1),</span> <span class="pre">(train_index2,</span> <span class="pre">test_index2)]</span></code> but this method won’t work with mosaic ensembles.</p>
+<p>Only a subset of models are taken from initial validation to cross validation. The number of models is set such as <code class="docutils literal notranslate"><span class="pre">models_to_validate=10</span></code>.
+If a float in 0 to 1 is provided, it is treated as a % of models to select.
+If you suspect your most recent data is not fairly representative of the whole, it would be a good idea to increase this parameter.
+However, increasing this value above, say, <code class="docutils literal notranslate"><span class="pre">0.35</span></code> (ie 35%) is unlikely to have much benefit, due to the similarity of many model parameters.</p>
+<p>While NaN values are handled, model selection will suffer if any series have large numbers of NaN values in any of the generated train/test splits.
+Most commonly, this may occur where some series have a very long history, while others in the same dataset only have very recent data.
+In these cases, avoid the <code class="docutils literal notranslate"><span class="pre">even</span></code> cross validation and use one of the other validation methods.</p>
+<p>Having many validations is critical with noisy data. If a large anomaly occurs, it can result in a model being chosen that predicted that anomaly, even though the prediction was by chance and the model is generally poor otherwise, that large spike by mature of it’s magnitude dominates the accuracy metrics.
+One partial hack to deal with limited history and anomalies is to have multiple custom validations that overlap but have slightly different start and end dates. As the anomalies will fall on different forecast horizons in each holdout, it’s less likely a model can predict the anomalies all by chance.</p>
+</section>
+<section id="id3">
+<h3>Another Example:<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<p>Here, we are forecasting the traffice along Interstate 94 between Minneapolis and St Paul in Minnesota. This is a great dataset to demonstrate a recommended way of including external variables - by including them as time series with a lower weighting.
+Here weather data is included - winter and road construction being the major influencers for traffic and will be forecast alongside the traffic volume. These additional series carry information to models such as <code class="docutils literal notranslate"><span class="pre">RollingRegression</span></code>, <code class="docutils literal notranslate"><span class="pre">VARMAX</span></code>, and <code class="docutils literal notranslate"><span class="pre">VECM</span></code>.</p>
+<p>Also seen in use here is the <code class="docutils literal notranslate"><span class="pre">model_list</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autots</span> <span class="kn">import</span> <span class="n">AutoTS</span>
+<span class="kn">from</span> <span class="nn">autots.datasets</span> <span class="kn">import</span> <span class="n">load_hourly</span>
+
+<span class="n">df_wide</span> <span class="o">=</span> <span class="n">load_hourly</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># here we care most about traffic volume, all other series assumed to be weight of 1</span>
+<span class="n">weights_hourly</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;traffic_volume&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+
+<span class="n">model_list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;LastValueNaive&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;GLS&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ETS&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;AverageValueNaive&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoTS</span><span class="p">(</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="mi">49</span><span class="p">,</span>
+    <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;infer&#39;</span><span class="p">,</span>
+    <span class="n">prediction_interval</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+    <span class="n">ensemble</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal-min&#39;</span><span class="p">],</span>
+    <span class="n">max_generations</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">num_validations</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">validation_method</span><span class="o">=</span><span class="s1">&#39;seasonal 168&#39;</span><span class="p">,</span>
+    <span class="n">model_list</span><span class="o">=</span><span class="n">model_list</span><span class="p">,</span>
+    <span class="n">transformer_list</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
+    <span class="n">models_to_validate</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">drop_most_recent</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">df_wide</span><span class="p">,</span>
+    <span class="n">weights</span><span class="o">=</span><span class="n">weights_hourly</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="n">forecasts_df</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">forecast</span>
+<span class="c1"># prediction.long_form_results()</span>
+</pre></div>
+</div>
+<p>Probabilistic forecasts are <em>available</em> for all models, but in many cases are just data-based estimates in lieu of model estimates.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">upper_forecasts_df</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">upper_forecast</span>
+<span class="n">lower_forecasts_df</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">lower_forecast</span>
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3>Model Lists<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<p>By default, most available models are tried. For a more limited subset of models, a custom list can be passed in, or more simply, a string, one of <code class="docutils literal notranslate"><span class="pre">'probabilistic',</span> <span class="pre">'multivariate',</span> <span class="pre">'fast',</span> <span class="pre">'superfast',</span> <span class="pre">or</span> <span class="pre">'all'</span></code>.</p>
+<p>A table of all available models is below.</p>
+<p>On large multivariate series, <code class="docutils literal notranslate"><span class="pre">DynamicFactor</span></code> and <code class="docutils literal notranslate"><span class="pre">VARMAX</span></code> can be impractically slow.</p>
+</section>
+</section>
+<section id="deployment-and-template-import-export">
+<h2>Deployment and Template Import/Export<a class="headerlink" href="#deployment-and-template-import-export" title="Link to this heading">¶</a></h2>
+<p>Take a look at the <a class="reference external" href="https://github.com/winedarksea/AutoTS/blob/master/production_example.py">production_example.py</a></p>
+<p>Many models can be reverse engineered with (relative) simplicity outside of AutoTS by placing the choosen parameters into Statsmodels or other underlying package.
+Following the model training, the top models can be exported to a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> or <code class="docutils literal notranslate"><span class="pre">.json</span></code> file, then on next run only those models will be tried.
+This allows for improved fault tolerance (by relying not on one, but several possible models and underlying packages), and some flexibility in switching models as the time series evolve.
+One thing to note is that, as AutoTS is still under development, template formats are likely to change and be incompatible with future package versions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># after fitting an AutoTS model</span>
+<span class="n">example_filename</span> <span class="o">=</span> <span class="s2">&quot;example_export.csv&quot;</span>  <span class="c1"># .csv/.json</span>
+<span class="n">model</span><span class="o">.</span><span class="n">export_template</span><span class="p">(</span><span class="n">example_filename</span><span class="p">,</span> <span class="n">models</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span>
+                      <span class="n">n</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">max_per_model_class</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># on new training</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoTS</span><span class="p">(</span><span class="n">forecast_length</span><span class="o">=</span><span class="n">forecast_length</span><span class="p">,</span>
+               <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;infer&#39;</span><span class="p">,</span> <span class="n">max_generations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+               <span class="n">num_validations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">import_template</span><span class="p">(</span><span class="n">example_filename</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;only&#39;</span><span class="p">)</span> <span class="c1"># method=&#39;add on&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overwrite template is: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">initial_template</span><span class="p">)))</span>
+</pre></div>
+</div>
+<section id="id5">
+<h3>Running Just One Model<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<p>While the above version of deployment, with  evolving templates and cross_validation on every run, is the recommended deployment, it is also possible to run a single fixed model.</p>
+<p>Coming from the deeper internals of AutoTS, this function can only take the <code class="docutils literal notranslate"><span class="pre">wide</span></code> style data (there is a long_to_wide function available).
+Data must already be fairly clean - all numerics (or np.nan).
+This will run Ensembles, and as such is generally recommended over loading the models directly. Subsidiary models use the sklearn format.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autots</span> <span class="kn">import</span> <span class="n">load_daily</span><span class="p">,</span> <span class="n">model_forecast</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">load_daily</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># long or non-numeric data won&#39;t work with this function</span>
+<span class="n">df_forecast</span> <span class="o">=</span> <span class="n">model_forecast</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;AverageValueNaive&quot;</span><span class="p">,</span>
+    <span class="n">model_param_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;Mean&#39;</span><span class="p">},</span>
+    <span class="n">model_transform_dict</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;fillna&#39;</span><span class="p">:</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;transformations&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;0&#39;</span><span class="p">:</span> <span class="s1">&#39;DifferencedTransformer&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;transformation_params&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;0&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+    <span class="p">},</span>
+    <span class="n">df_train</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;infer&#39;</span><span class="p">,</span>
+    <span class="n">prediction_interval</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+    <span class="n">no_negatives</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="c1"># future_regressor_train=future_regressor_train2d,</span>
+    <span class="c1"># future_regressor_forecast=future_regressor_forecast2d,</span>
+    <span class="n">random_seed</span><span class="o">=</span><span class="mi">321</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">df_forecast</span><span class="o">.</span><span class="n">forecast</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">model.predict()</span></code> of AutoTS class runs the model given by three stored attributes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">best_model_name</span><span class="p">,</span>
+<span class="n">model</span><span class="o">.</span><span class="n">best_model_params</span><span class="p">,</span>
+<span class="n">model</span><span class="o">.</span><span class="n">best_model_transformation_params</span>
+</pre></div>
+</div>
+<p>If you overwrite these, it will accordingly change the forecast output.</p>
+</section>
+<section id="id6">
+<h3>Metrics<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<p>There are a number of available metrics, all combined together into a ‘Score’ which evaluates the best model. The ‘Score’ that compares models can easily be adjusted by passing through custom metric weights dictionary.
+Higher weighting increases the importance of that metric, while 0 removes that metric from consideration. Weights must be numbers greater than or equal to 0.
+This weighting is not to be confused with series weighting, which effects how equally any one metric is applied to all the series.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">metric_weighting</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;smape_weighting&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s1">&#39;mae_weighting&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;rmse_weighting&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;made_weighting&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="s1">&#39;mage_weighting&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;mle_weighting&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;imle_weighting&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;spl_weighting&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;containment_weighting&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;contour_weighting&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;runtime_weighting&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoTS</span><span class="p">(</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="n">forecast_length</span><span class="p">,</span>
+    <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;infer&#39;</span><span class="p">,</span>
+    <span class="n">metric_weighting</span><span class="o">=</span><span class="n">metric_weighting</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>It is best to use several metrics for several reasons. The first is to avoid overfitting - a model that does well on many metrics is less likely to be overfit.
+Secondly, forecasts often have to meet multiple expectations. Using a composite score allows balancing the
+quality of point forecast, quality of probabilistic forecast, overestimation or underestimation, visual fit, and speed of runtime.</p>
+<p>Some metrics are scaled and some are not. MAE, RMSE, MAGE, MLE, iMLE are unscaled and accordingly in multivariate forecasting will favor model performance on the largest scale input series.</p>
+<p><em>Horizontal</em> style ensembles use <code class="docutils literal notranslate"><span class="pre">metric_weighting</span></code> for series selection, but only the values passed for <code class="docutils literal notranslate"><span class="pre">mae,</span> <span class="pre">rmse,</span> <span class="pre">made,</span> <span class="pre">mle,</span> <span class="pre">imle,</span> <span class="pre">contour,</span> <span class="pre">spl</span></code>. If all of these are 0, mae is used for selection.
+Accordingly it may be better to reduce the use of<code class="docutils literal notranslate"><span class="pre">smape</span></code>, <code class="docutils literal notranslate"><span class="pre">containment</span></code>, and <code class="docutils literal notranslate"><span class="pre">mage</span></code> weighting when using these ensembles. With univariate models, runtime for overall won’t translate to runtime inside a horizontal ensemble.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sMAPE</span></code> is <em>Symmetric Mean Absolute Percentage Loss</em> and is generally the most versatile metric across multiple series as it is scaled. It doesn’t handle forecasts with lots of zeroes well.</p>
+<p><code class="docutils literal notranslate"><span class="pre">SPL</span></code> is <em>Scaled Pinball Loss</em>, sometimes called <em>Quantile Loss</em>, and is the optimal metric for optimizing upper/lower quantile forecast accuracies.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Containment</span></code> measures the percent of test data that falls between the upper and lower forecasts, and is more human readable than SPL. Also called <code class="docutils literal notranslate"><span class="pre">coverage_fraction</span></code> in other places.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MLE</span></code> and <code class="docutils literal notranslate"><span class="pre">iMLE</span></code> are <em>Mean Logarithmic Error</em> inspired by the <code class="docutils literal notranslate"><span class="pre">mean</span> <span class="pre">squared</span> <span class="pre">log</span> <span class="pre">error</span></code>. They are used to target over or underestimation with MAE of the penalized direction and log(error) for the less-penalized (and less outlier sensitive) direction.
+<code class="docutils literal notranslate"><span class="pre">MLE</span></code> penalizes an under-predicted forecast greater than an over-predicted forecast.
+<code class="docutils literal notranslate"><span class="pre">iMLE</span></code> is the inverse, and penalizes an over-prediction more.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MAGE</span></code> is <em>Mean Absolute aGgregate Error</em> which measures the error of a rollup of the forecasts. This is helpful in hiearchial/grouped forecasts for selecting series that have minimal overestimation or underestimation when summed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Contour</span></code> is designed to help choose models which when plotted visually appear similar to the actual. As such, it measures the % of points where the forecast and actual both went in the same direction, either both up or both down, but <em>not</em> the magnitude of that difference. It is more human-readable than MADE for this information.
+This is similar to but faster than MDA (mean directional accuracy) as contour evaluates no change as a positive case.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MADE</span></code> is <em>(Scaled) Mean Absolute Differential Error</em>. Similar to contour, it measures how well similar a forecast changes are to the timestep changes in the actual. Contour measures direction while MADE measures magnitude. Equivalent to ‘MAE’ when forecast_length=1. It is better for optimization than contour.</p>
+<p>There are also shape and direction focused weightings such as <code class="docutils literal notranslate"><span class="pre">oda_weighting</span></code>, <code class="docutils literal notranslate"><span class="pre">dwae_weighting</span></code>, <code class="docutils literal notranslate"><span class="pre">ewmae_weighting</span></code>, <code class="docutils literal notranslate"><span class="pre">uwmse_weighting</span></code>, <code class="docutils literal notranslate"><span class="pre">smoothness_weighting</span></code>, <code class="docutils literal notranslate"><span class="pre">dwd_weighting</span></code>, <code class="docutils literal notranslate"><span class="pre">maxe_weighting</span></code>, <code class="docutils literal notranslate"><span class="pre">mqae_weighting</span></code>, <code class="docutils literal notranslate"><span class="pre">mate_weighting</span></code>, <code class="docutils literal notranslate"><span class="pre">matse_weighting</span></code>, and <code class="docutils literal notranslate"><span class="pre">wasserstein_weighting</span></code> that can be mixed in when those behaviors need emphasis.</p>
+<p>The contour and MADE metrics are useful as they encourages ‘wavy’ forecasts, ie, not flat line forecasts. Although flat line naive or linear forecasts can sometimes be very good models, they “don’t look like they are trying hard enough” to some managers, and using them favors non-flat forecasts that (to many) look like a more serious model.</p>
+<p>If a metric is entirely NaN in the initial results, likely that holdout was entirely NaN in actuals.</p>
+<p>It may be worth viewing something like: <code class="docutils literal notranslate"><span class="pre">model.score_breakdown[model.score_breakdown.index</span> <span class="pre">==</span> <span class="pre">model.best_model_id].iloc[0]</span></code> to see if any one score is skewing selection.
+Generally you would want the numbers here to follow the balance requested in the <code class="docutils literal notranslate"><span class="pre">metric_weighting</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoTS</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+
+<span class="n">prediction</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">df_wide_numeric</span><span class="p">,</span>
+    <span class="n">series</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">df_wide_numeric</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+    <span class="n">remove_zeroes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">start_date</span><span class="o">=</span><span class="s2">&quot;2018-09-26&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">plot_per_series_mape</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;pie&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">plot_per_series_error</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">plot_generation_loss</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">best_model_ensemble</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">plot_horizontal_per_generation</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">plot_horizontal_transformers</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;fillna&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">plot_horizontal_transformers</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">plot_horizontal</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;mosaic&quot;</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">best_model</span><span class="p">[</span><span class="s2">&quot;ModelParameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="n">mosaic_df</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">mosaic_to_df</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">mosaic_df</span><span class="p">[</span><span class="n">mosaic_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># slow</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">plot_backforecast</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="s2">&quot;2019-01-01&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="hierarchial-and-grouped-forecasts">
+<h3>Hierarchial and Grouped Forecasts<a class="headerlink" href="#hierarchial-and-grouped-forecasts" title="Link to this heading">¶</a></h3>
+<p>Hiearchial and grouping refer to multivariate forecast situations where the individual series are aggregated.
+A common example of this is product sales forecasting, where individual products are forecast and then also aggregated for a view on demand across all products.
+Aggregation combines the errors of individual series, however, potentially resulting in major over- or -under estimation of the overall demand.
+Traditionally to solve this problem, reconciliation is used where a top-level and lower-level forecasts are averaged or otherwise adjusted to produce a less exaggerated final result.</p>
+<p>Unfortunately, any reconciliation approach is inherently sub-optimal.
+On real world data with optimized forecasts, the error contributions of individual series and the direction of the error (over- or under- estimate) are usually unstable,
+not only from forecast to forecast but from timestep to timestep inside each forecast. Thus reconciliation often reassigns the wrong amount of error to the wrong place.</p>
+<p>The suggestion here for this problem is to target the problem from the beginning and utilize the <code class="docutils literal notranslate"><span class="pre">MAGE</span></code> metric across validations.
+This assesses how well the forecasts aggregate, and when used as part of metric_weighting drives model selection towards forecasts that aggregate well.
+<code class="docutils literal notranslate"><span class="pre">MAGE</span></code> assesses all series present, so if very distinct sub-groups are present, it may be sometimes necessary to model those groups in separate runs.
+Additionally, <code class="docutils literal notranslate"><span class="pre">MLE</span></code> or <code class="docutils literal notranslate"><span class="pre">iMLE</span></code> can be used if either underestimation or overestimation respectively has been identified as a problem.</p>
+</section>
+<section id="id7">
+<h3>Ensembles<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<p>Ensemble methods are specified by the <code class="docutils literal notranslate"><span class="pre">ensemble=</span></code> parameter. It can be either a list or a comma-separated string.</p>
+<p><code class="docutils literal notranslate"><span class="pre">simple</span></code> style ensembles (labeled ‘BestN’ in templates) are the most recognizable form of ensemble and are the simple average of the specified models, here usally 3 or 5 models.
+<code class="docutils literal notranslate"><span class="pre">distance</span></code> style ensembles are two models spliced together. The first model forecasts the first fraction of forecast period, the second model the latter half. There is no overlap of the models.
+Both <code class="docutils literal notranslate"><span class="pre">simple</span></code> and <code class="docutils literal notranslate"><span class="pre">distance</span></code> style models are constructed on the first evaluation set of data, and run through validation along with all other models selected for validation.
+Both of these can also be recursive in depth, containing ensembles of ensembles. This recursive ensembling can happen when ensembles are imported from a starting template - they work just fine, but may get rather slow, having lots of models.</p>
+<p><code class="docutils literal notranslate"><span class="pre">horizontal</span></code> ensembles are the type of ensembles for which this package was originally created.
+With this, each series gets its own model. This avoids the ‘one size does not fit all’ problem when many time series are in a dataset.
+In the interest of efficiency, univariate models are only run on the series they are needed for.
+Models not in the <code class="docutils literal notranslate"><span class="pre">no_shared</span></code> list may make horizontal ensembling very slow at scale - as they have to be run for every series, even if they are only used for one.
+<code class="docutils literal notranslate"><span class="pre">horizontal-max</span></code> chooses the best series for every model. <code class="docutils literal notranslate"><span class="pre">horizontal</span></code> and <code class="docutils literal notranslate"><span class="pre">horizontal-min</span></code> attempt to reduce the number of slow models chosen while still maintaining as much accuracy as possble.
+A feature called <code class="docutils literal notranslate"><span class="pre">horizontal_generalization</span></code> allows the use of <code class="docutils literal notranslate"><span class="pre">subset</span></code> and makes these ensembles fault tolerant.
+If you see a message <code class="docutils literal notranslate"><span class="pre">no</span> <span class="pre">full</span> <span class="pre">models</span> <span class="pre">available</span></code>, however, that means this generalization may fail. Including at least one of the <code class="docutils literal notranslate"><span class="pre">superfast</span></code> or a model not in <code class="docutils literal notranslate"><span class="pre">no_shared</span></code> models usually prevents this.
+These ensembles are choosen based on per series accuracy on <code class="docutils literal notranslate"><span class="pre">mae,</span> <span class="pre">rmse,</span> <span class="pre">contour,</span> <span class="pre">spl</span></code>, weighted as specified in <code class="docutils literal notranslate"><span class="pre">metric_weighting</span></code>.
+<code class="docutils literal notranslate"><span class="pre">horizontal</span></code> ensembles can contain recursive depths of <code class="docutils literal notranslate"><span class="pre">simple</span></code> and <code class="docutils literal notranslate"><span class="pre">distance</span></code> style ensembles but <code class="docutils literal notranslate"><span class="pre">horizontal</span></code> ensembles cannot be nested.</p>
+<p><code class="docutils literal notranslate"><span class="pre">mosaic</span></code> enembles are an extension of <code class="docutils literal notranslate"><span class="pre">horizontal</span></code> ensembles, but with a specific model choosen for each series <em>and</em> for each forecast period.
+As this means the maximum number of models can be <code class="docutils literal notranslate"><span class="pre">number</span> <span class="pre">of</span> <span class="pre">series</span> <span class="pre">*</span> <span class="pre">forecast_length</span></code>, this obviously may get quite slow.
+Theoretically, this style of ensembling offers the highest accuracy.
+They are much more prone to over-fitting, so use this with more validations and more stable data.
+Unlike <code class="docutils literal notranslate"><span class="pre">horizontal</span></code> ensembles, which only work on multivariate datasets, <code class="docutils literal notranslate"><span class="pre">mosaic</span></code> can be run on a single time series with a horizon &gt; 1.</p>
+<p>One thing you can do with <code class="docutils literal notranslate"><span class="pre">mosaic</span></code> ensembles if you only care about the accuracy of one forecast point, but want to run a forecast for the full forecast length, you can convert the mosaic to horizontal for just that forecast period.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">autots.models.ensemble</span> <span class="kn">import</span> <span class="n">mosaic_to_horizontal</span><span class="p">,</span> <span class="n">model_forecast</span>
+
+<span class="c1"># assuming model is from AutoTS.fit() with a mosaic as best_model</span>
+<span class="n">model_params</span> <span class="o">=</span> <span class="n">mosaic_to_horizontal</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">best_model_params</span><span class="p">,</span> <span class="n">forecast_period</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">model_forecast</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;Ensemble&quot;</span><span class="p">,</span>
+    <span class="n">model_param_dict</span><span class="o">=</span><span class="n">model_params</span><span class="p">,</span>
+    <span class="n">model_transform_dict</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">df_train</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">df_wide_numeric</span><span class="p">,</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">forecast_length</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">forecast</span>
+</pre></div>
+</div>
+<p>Ensembles use the top level <code class="docutils literal notranslate"><span class="pre">TransformationParameters</span></code> <em>only</em> as postprocessing. Data is otherwise passed unaltered to the component models with their own transformation parameters.</p>
+</section>
+</section>
+<section id="installation-and-dependency-versioning">
+<h2>Installation and Dependency Versioning<a class="headerlink" href="#installation-and-dependency-versioning" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">autots</span></code></p>
+<p>Some optional packages require installing <a class="reference external" href="https://visualstudio.microsoft.com/visual-cpp-build-tools/">Visual Studio C compilers</a> if on Windows.</p>
+<p>On Linux systems, apt-get/yum (rather than pip) installs of numpy/pandas may install faster/more stable compilations.
+Linux may also require <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">build-essential</span></code> for some packages.</p>
+<p>You can check if your system is using mkl, OpenBLAS, or none with <code class="docutils literal notranslate"><span class="pre">numpy.show_config()</span></code>. Generally recommended that you double-check this after installing new packages to make sure you haven’t broken the LINPACK connection.</p>
+<section id="requirements">
+<h3>Requirements:<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Python &gt;= 3.9
+numpy
+    &gt;= 1.20 (Sliding Window in Motif and WindowRegression)
+pandas
+    &gt;= 1.1.0 (prediction.long_form_results())
+sklearn
+    &gt;= 0.23.0 (PoissonReg)
+    &gt;= 0.24.0 (OrdinalEncoder handle_unknown)
+    &gt;= 1.0 for models effected by &quot;mse&quot; -&gt; &quot;squared_error&quot; update
+    &gt;? (IterativeImputer, HistGradientBoostingRegressor)
+statsmodels
+    &gt;= 0.13 ARDL and UECM
+scipy.uniform_filter1d (for mosaic-window ensemble only)
+scipy.stats (anomaly detection, Kalman)
+scipy.signal (ScipyFilter)
+scipy.spatial.cdist (Motifs)
+</pre></div>
+</div>
+<p>Of these, numpy and pandas are critical.
+Limited functionality should exist without scikit-learn.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Sklearn</span> <span class="n">needed</span> <span class="k">for</span> <span class="n">categorical</span> <span class="n">to</span> <span class="n">numeric</span><span class="p">,</span> <span class="n">some</span> <span class="n">detrends</span><span class="o">/</span><span class="n">transformers</span><span class="p">,</span> <span class="n">horizontal</span> <span class="n">generalization</span><span class="p">,</span> <span class="n">numerous</span> <span class="n">models</span><span class="p">,</span> <span class="n">nan_euclidean</span> <span class="n">distance</span>
+</pre></div>
+</div>
+<p>Full functionality should be maintained without statsmodels, albeit with fewer available models.</p>
+<p>Prophet and mxnet/GluonTS are packages which tend to be finicky about installation on some systems.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">autots['additional']</span></code></p>
+</section>
+<section id="optional-packages">
+<h3>Optional Packages<a class="headerlink" href="#optional-packages" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">requests</span>
+<span class="n">psutil</span>
+<span class="n">holidays</span>
+<span class="n">prophet</span>
+<span class="n">gluonts</span> <span class="p">(</span><span class="n">requires</span> <span class="n">mxnet</span><span class="p">)</span>
+<span class="n">mxnet</span> <span class="p">(</span><span class="n">mxnet</span><span class="o">-</span><span class="n">mkl</span><span class="p">,</span> <span class="n">mxnet</span><span class="o">-</span><span class="n">cu91</span><span class="p">,</span> <span class="n">mxnet</span><span class="o">-</span><span class="n">cu101mkl</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span><span class="p">)</span>
+<span class="n">tensorflow</span> <span class="o">&gt;=</span> <span class="mf">2.0.0</span>
+<span class="n">lightgbm</span>
+<span class="n">xgboost</span>
+<span class="n">tensorflow</span><span class="o">-</span><span class="n">probability</span>
+<span class="n">fredapi</span>
+<span class="n">matplotlib</span>
+<span class="n">pytorch</span><span class="o">-</span><span class="n">forecasting</span>
+<span class="n">scipy</span>
+<span class="n">arch</span>
+</pre></div>
+</div>
+<p>Tensorflow, LightGBM, and XGBoost bring powerful models, but are also among the slowest. If speed is a concern, not installing them will speed up ~Regression style model runs.</p>
+<section id="safest-bet-for-installation">
+<h4>Safest bet for installation:<a class="headerlink" href="#safest-bet-for-installation" title="Link to this heading">¶</a></h4>
+<p>venv, Anaconda, or <a class="reference external" href="https://github.com/conda-forge/miniforge/">Miniforge</a> with some more tips.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># create a mamba, conda, or venv environment</span>
+mamba<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>timeseries<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12<span class="w"> </span>scikit-learn<span class="w"> </span>statsmodels<span class="w"> </span>matplotlib<span class="w"> </span>tqdm<span class="w"> </span>prophet<span class="w"> </span>holidays<span class="w"> </span>lightgbm<span class="w"> </span>xgboost<span class="w"> </span>numexpr<span class="w"> </span>bottleneck<span class="w"> </span>seaborn<span class="w"> </span>autots<span class="w"> </span>pytorch<span class="w"> </span>torchvision<span class="w"> </span>torchaudio<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>-c<span class="w"> </span>pytorch
+conda<span class="w"> </span>activate<span class="w"> </span>timeseries
+python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>tensorflow<span class="w"> </span>yfinance<span class="w"> </span>pytrends<span class="w"> </span>fredapi<span class="w"> </span>arch<span class="w"> </span>neuralforecast<span class="w"> </span>--exists-action<span class="w"> </span>i
+<span class="c1"># OMP_NUM_THREADS</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="speed-benchmark">
+<h3>Speed Benchmark<a class="headerlink" href="#speed-benchmark" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autots.evaluator.benchmark</span> <span class="kn">import</span> <span class="n">Benchmark</span>
+<span class="n">bench</span> <span class="o">=</span> <span class="n">Benchmark</span><span class="p">()</span>
+<span class="n">bench</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">bench</span><span class="o">.</span><span class="n">results</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="caveats-and-advice">
+<h2>Caveats and Advice<a class="headerlink" href="#caveats-and-advice" title="Link to this heading">¶</a></h2>
+<section id="mysterious-crashes">
+<h3>Mysterious crashes<a class="headerlink" href="#mysterious-crashes" title="Link to this heading">¶</a></h3>
+<p>Usually mysterious crashes or hangs (those without clear error messages) occur when the CPU or Memory is overloaded.</p>
+<p>Try setting <code class="docutils literal notranslate"><span class="pre">n_jobs=1</span></code> or an otherwise low number, which should reduce the load. Also test the ‘superfast’ naive models, which are generally low resource consumption.
+GPU-accelerated models (Tensorflow in Regressions and GluonTS) are also more prone to crashes, and may be a source of problems when used.
+If problems persist, post to the GitHub Discussion or Issues.</p>
+<p>Rebooting between heavy uses of multiprocessing can also help reduce the risk of crashing in future model runs.</p>
+</section>
+<section id="series-ids-really-need-to-be-unique-or-column-names-need-to-be-all-unique-in-wide-data">
+<h3>Series IDs really need to be unique (or column names need to be all unique in wide data)<a class="headerlink" href="#series-ids-really-need-to-be-unique-or-column-names-need-to-be-all-unique-in-wide-data" title="Link to this heading">¶</a></h3>
+<p>Pretty much as it says, if this isn’t true, some odd things may happen that shouldn’t.</p>
+<p>Also if using the Prophet model, you can’t have any series named ‘ds’</p>
+</section>
+<section id="short-training-history">
+<h3>Short Training History<a class="headerlink" href="#short-training-history" title="Link to this heading">¶</a></h3>
+<p>How much data is ‘too little’ depends on the seasonality and volatility of the data.
+Minimal training data most greatly impacts the ability to do proper cross validation. Set <code class="docutils literal notranslate"><span class="pre">num_validations=0</span></code> in such cases.
+Since ensembles are based on the test dataset, it would also be wise to set <code class="docutils literal notranslate"><span class="pre">ensemble=None</span></code> if <code class="docutils literal notranslate"><span class="pre">num_validations=0</span></code>.</p>
+</section>
+<section id="adding-regressors-and-other-information">
+<h3>Adding regressors and other information<a class="headerlink" href="#adding-regressors-and-other-information" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">future_</span></code> regressor, to make it clear this is data that will be know with high certainy about the future.
+Such data about the future is rare, one example might be number of stores that will be (planned to be) open each given day in the future when forecast sales.
+Generally using regressors is very helpful for separating ‘organic’ and ‘inorganic’ patterns.
+‘Inorganic’ patterns refers to human business decisions that effect the outcome and can be controlled.
+A very common example of those is promotions and sales events.
+The model can learn from the past promotion information to then anticpate the effects of the input planned promotion events.
+Simulation forecasting, described below, is where multiple promotional plans can be tested side-by-side to evaluate effectiveness.</p>
+<p>Only a handful of models support adding regressors, and not all handle multiple regressors.
+The way to provide regressors is in the <code class="docutils literal notranslate"><span class="pre">wide</span></code> style as a pd.Series/pd.Dataframe with a DatetimeIndex.</p>
+<p>Don’t know the future? Don’t worry, the models can handle quite a lot of parallel time series, which is another way to add information.
+Additional regressors can be passed through as additional time series to forecast as part of df_long.
+Some models here can utilize the additional information they provide to help improve forecast quality.
+To prevent forecast accuracy for considering these additional series too heavily, input series weights that lower or remove their forecast accuracy from consideration.</p>
+<p><em>an example of regressors:</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autots.datasets</span> <span class="kn">import</span> <span class="n">load_monthly</span>
+<span class="kn">from</span> <span class="nn">autots.tools.regressor</span> <span class="kn">import</span> <span class="n">fake_regressor</span>
+<span class="kn">from</span> <span class="nn">autots</span> <span class="kn">import</span> <span class="n">AutoTS</span>
+
+<span class="n">long</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">load_monthly</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="n">long</span><span class="p">)</span>
+<span class="n">forecast_length</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoTS</span><span class="p">(</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="n">forecast_length</span><span class="p">,</span>
+    <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;infer&#39;</span><span class="p">,</span>
+    <span class="n">validation_method</span><span class="o">=</span><span class="s2">&quot;backwards&quot;</span><span class="p">,</span>
+    <span class="n">max_generations</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">future_regressor_train2d</span><span class="p">,</span> <span class="n">future_regressor_forecast2d</span> <span class="o">=</span> <span class="n">fake_regressor</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">dimensions</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="n">forecast_length</span><span class="p">,</span>
+    <span class="n">date_col</span><span class="o">=</span><span class="s1">&#39;datetime&#39;</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">value_col</span><span class="o">=</span><span class="s1">&#39;value&#39;</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">id_col</span><span class="o">=</span><span class="s1">&#39;series_id&#39;</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">drop_most_recent</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">drop_most_recent</span><span class="p">,</span>
+    <span class="n">aggfunc</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">aggfunc</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">future_regressor</span><span class="o">=</span><span class="n">future_regressor_train2d</span><span class="p">,</span>
+    <span class="n">date_col</span><span class="o">=</span><span class="s1">&#39;datetime&#39;</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">value_col</span><span class="o">=</span><span class="s1">&#39;value&#39;</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">id_col</span><span class="o">=</span><span class="s1">&#39;series_id&#39;</span> <span class="k">if</span> <span class="n">long</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">future_regressor</span><span class="o">=</span><span class="n">future_regressor_forecast2d</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">forecasts_df</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">forecast</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For models here in the lower level api, confusingly, regression_type=”User” must be specified as well as passing future_regressor. Why? This allows the model search to easily try both with and without the regressor, because sometimes the regressor may do more harm than good.</p>
+<p>Keep in mind that no preprocessing/transformers are done on regressors in most cases here, so it is recommended to clean the regressors of anomalies, and often it may be helpful to deseasonalize and scale the regressors as well.</p>
+</section>
+</section>
+<section id="id8">
+<h2>Simulation Forecasting<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<p>Simulation forecasting allows for experimenting with different potential future scenarios to examine the potential effects on the forecast.
+This is done here by passing known values of a <code class="docutils literal notranslate"><span class="pre">future_regressor</span></code> to model <code class="docutils literal notranslate"><span class="pre">.fit</span></code> and then running <code class="docutils literal notranslate"><span class="pre">.predict</span></code> with multiple variations on the <code class="docutils literal notranslate"><span class="pre">future_regressor</span></code> future values.
+By default in AutoTS, when a <code class="docutils literal notranslate"><span class="pre">future_regressor</span></code> is supplied, models that can utilize it are tried both with and without the regressor.
+To enforce the use of future_regressor for simulation forecasting, a few parameters must be supplied as below. They are: <code class="docutils literal notranslate"><span class="pre">model_list,</span> <span class="pre">models_mode,</span> <span class="pre">initial_template</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autots.datasets</span> <span class="kn">import</span> <span class="n">load_monthly</span>
+<span class="kn">from</span> <span class="nn">autots.tools.regressor</span> <span class="kn">import</span> <span class="n">fake_regressor</span>
+<span class="kn">from</span> <span class="nn">autots</span> <span class="kn">import</span> <span class="n">AutoTS</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">load_monthly</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">forecast_length</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoTS</span><span class="p">(</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="n">forecast_length</span><span class="p">,</span>
+    <span class="n">max_generations</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">model_list</span><span class="o">=</span><span class="s2">&quot;regressor&quot;</span><span class="p">,</span>
+    <span class="n">models_mode</span><span class="o">=</span><span class="s2">&quot;regressor&quot;</span><span class="p">,</span>
+    <span class="n">initial_template</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># here these are random numbers but in the real world they could be values like weather or store holiday hours</span>
+<span class="n">future_regressor_train</span><span class="p">,</span> <span class="n">future_regressor_forecast</span> <span class="o">=</span> <span class="n">fake_regressor</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="n">forecast_length</span><span class="p">,</span>
+    <span class="n">drop_most_recent</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">drop_most_recent</span><span class="p">,</span>
+    <span class="n">aggfunc</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">aggfunc</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># another simulation of regressor</span>
+<span class="n">future_regressor_forecast_2</span> <span class="o">=</span> <span class="n">future_regressor_forecast</span> <span class="o">+</span> <span class="mi">10</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">future_regressor</span><span class="o">=</span><span class="n">future_regressor_train</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># first with one version</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">future_regressor</span><span class="o">=</span><span class="n">future_regressor_forecast</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">forecasts_df</span> <span class="o">=</span> <span class="n">prediction</span><span class="o">.</span><span class="n">forecast</span>
+
+<span class="c1"># then with another</span>
+<span class="n">prediction_2</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">future_regressor</span><span class="o">=</span><span class="n">future_regressor_forecast_2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">forecasts_df_2</span> <span class="o">=</span> <span class="n">prediction_2</span><span class="o">.</span><span class="n">forecast</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note, this does not necessarily force the model to place any great value on the supplied features.
+It may be necessary to rerun multiple times until a model with satisfactory variable response is found,
+or to try with a subset of the regressor model list like <code class="docutils literal notranslate"><span class="pre">['FBProphet',</span> <span class="pre">'GLM',</span> <span class="pre">'ARDL',</span> <span class="pre">'DatepartRegression']</span></code>.</p>
+</section>
+<section id="event-risk-forecasting-and-anomaly-detection">
+<h2>Event Risk Forecasting and Anomaly Detection<a class="headerlink" href="#event-risk-forecasting-and-anomaly-detection" title="Link to this heading">¶</a></h2>
+<p>Anomaly (or Outlier) Detection is historic and Event Risk Forecasting is forward looking.</p>
+<p>Event Risk Forecasting
+Generate a risk score (0 to 1, but usually close to 0) for a future event exceeding user specified upper or lower bounds.</p>
+<p>Upper and lower limits can be one of four types, and may each be different.</p>
+<ol class="arabic simple">
+<li><p>None (no risk score calculated for this direction)</p></li>
+<li><p>Float in range [0, 1] historic quantile of series (which is historic min and max at edges) is chosen as limit.</p></li>
+<li><dl class="simple">
+<dt>A dictionary of {“model_name”: x,  “model_param_dict”: y, “model_transform_dict”: z, “prediction_interval”: 0.9} to generate a forecast as the limits</dt><dd><p>Primarily intended for simple forecasts like SeasonalNaive, but can be used with any AutoTS model</p>
+</dd>
+</dl>
+</li>
+<li><p>a custom input numpy array of shape (forecast_length, num_series)</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">autots</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">load_daily</span><span class="p">,</span>
+    <span class="n">EventRiskForecast</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">multilabel_confusion_matrix</span><span class="p">,</span> <span class="n">classification_report</span>
+
+<span class="n">forecast_length</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">df_full</span> <span class="o">=</span> <span class="n">load_daily</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df_full</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="p">(</span><span class="n">df_full</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">forecast_length</span><span class="p">)]</span>
+<span class="n">df_test</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">forecast_length</span><span class="p">):]</span>
+
+<span class="n">upper_limit</span> <span class="o">=</span> <span class="mf">0.95</span>  <span class="c1"># --&gt; 95% quantile of historic data</span>
+<span class="c1"># if using manual array limits, historic limit must be defined separately (if used)</span>
+<span class="n">lower_limit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">forecast_length</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">historic_lower_limit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">EventRiskForecast</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">forecast_length</span><span class="o">=</span><span class="n">forecast_length</span><span class="p">,</span>
+    <span class="n">upper_limit</span><span class="o">=</span><span class="n">upper_limit</span><span class="p">,</span>
+    <span class="n">lower_limit</span><span class="o">=</span><span class="n">lower_limit</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># .fit() is optional if model_name, model_param_dict, model_transform_dict are already defined (overwrites)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">risk_df_upper</span><span class="p">,</span> <span class="n">risk_df_lower</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="n">historic_upper_risk_df</span><span class="p">,</span> <span class="n">historic_lower_risk_df</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_historic</span><span class="p">(</span><span class="n">lower_limit</span><span class="o">=</span><span class="n">historic_lower_limit</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">eval_lower</span> <span class="o">=</span> <span class="n">EventRiskForecast</span><span class="o">.</span><span class="n">generate_historic_risk_array</span><span class="p">(</span><span class="n">df_test</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">lower_limit_2d</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">)</span>
+<span class="n">eval_upper</span> <span class="o">=</span> <span class="n">EventRiskForecast</span><span class="o">.</span><span class="n">generate_historic_risk_array</span><span class="p">(</span><span class="n">df_test</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">upper_limit_2d</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">)</span>
+<span class="n">pred_lower</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">lower_risk_array</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">pred_upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">upper_risk_array</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">plot_eval</span><span class="p">(</span><span class="n">df_test</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">multilabel_confusion_matrix</span><span class="p">(</span><span class="n">eval_upper</span><span class="p">,</span> <span class="n">pred_upper</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">eval_upper</span><span class="p">,</span> <span class="n">pred_upper</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># target_names=df.columns</span>
+</pre></div>
+</div>
+<p>A limit specified by a forecast can be used to use one type of model to judge the risk of another production model’s bounds (here ARIMA) being exceeded.
+This is also useful for visualizing the effectivness of a particular model’s probabilistic forecasts.</p>
+<p>Using forecasts as a limit is also a common method of detecting anomalies in historic data - looking for data points that exceeded what a forecast would have expected.
+Forecast_length effects how far ahead each forecast step is. Larger is faster, smaller means tighter accuracy (only the most extreme outliers are flagged).
+<code class="docutils literal notranslate"><span class="pre">predict_historic</span></code> is used for looking back on the training dataset. Use <code class="docutils literal notranslate"><span class="pre">eval_periods</span></code> to look at only a portion.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lower_limit</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;model_name&quot;</span><span class="p">:</span> <span class="s2">&quot;ARIMA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;model_param_dict&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="s2">&quot;model_transform_dict&quot;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s2">&quot;prediction_interval&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Anomaly Detection</p>
+<p>Multiple methods are available, including use of <code class="docutils literal notranslate"><span class="pre">forecast_params</span></code> which can be used to analyze the historic deviations of an AutoTS forecasting model.</p>
+<p>Holiday detection may also pick up events or ‘anti-holidays’ ie days of low demand. It won’t pick up holidays that don’t usually have a significant impact.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autots.evaluator.anomaly_detector</span> <span class="kn">import</span> <span class="n">AnomalyDetector</span>
+<span class="kn">from</span> <span class="nn">autots.datasets</span> <span class="kn">import</span> <span class="n">load_live_daily</span>
+
+<span class="c1"># internet connection required to load this df</span>
+<span class="n">wiki_pages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Standard_deviation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Christmas&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Thanksgiving&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">load_live_daily</span><span class="p">(</span>
+    <span class="n">long</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">fred_series</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">tickers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">trends_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">earthquake_min_magnitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">weather_stations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">london_air_stations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">gov_domain_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">weather_event_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">wikipedia_pages</span><span class="o">=</span><span class="n">wiki_pages</span><span class="p">,</span>
+    <span class="n">sleep_seconds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="n">AnomalyDetector</span><span class="o">.</span><span class="n">get_new_params</span><span class="p">()</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">AnomalyDetector</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s1">&#39;multivariate&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">scores</span> <span class="c1"># meaning of scores varies by method</span>
+
+<span class="c1"># holiday detection, random parameters</span>
+<span class="n">holiday_params</span> <span class="o">=</span> <span class="n">HolidayDetector</span><span class="o">.</span><span class="n">get_new_params</span><span class="p">()</span>
+<span class="n">mod</span> <span class="o">=</span> <span class="n">HolidayDetector</span><span class="p">(</span><span class="o">**</span><span class="n">holiday_params</span><span class="p">)</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="c1"># several outputs are possible, you&#39;ll need to subset results from multivariate inputs</span>
+<span class="n">full_dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2014-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-01-01&quot;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+<span class="n">prophet_holidays</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">dates_to_holidays</span><span class="p">(</span><span class="n">full_dates</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;prophet&quot;</span><span class="p">)</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="a-hack-for-passing-in-parameters-that-aren-t-otherwise-available">
+<h3>A Hack for Passing in Parameters (that aren’t otherwise available)<a class="headerlink" href="#a-hack-for-passing-in-parameters-that-aren-t-otherwise-available" title="Link to this heading">¶</a></h3>
+<p>There are a lot of parameters available here, but not always all of the options available for a particular parameter are actually used in generated templates.
+Usually, very slow options are left out. If you are familiar with a model, you can try manualy adding those parameter values in for a run in this way…
+To clarify, you can’t usually add in entirely new parameters in this way, but you can often pass in new choices for existing parameter values.</p>
+<ol class="arabic simple">
+<li><p>Run AutoTS with your desired model and export a template.</p></li>
+<li><p>Open the template in a text editor or Excel and manually change the param values to what you want.</p></li>
+<li><p>Run AutoTS again, this time importing the template before running .fit().</p></li>
+<li><p>There is no guarantee it will choose the model with the given params- choices are made based on validation accuracy, but it will at least run it, and if it does well, it will be incorporated into new models in that run (that’s how the genetic algorithms work).</p></li>
+</ol>
+</section>
+<section id="categorical-data">
+<h3>Categorical Data<a class="headerlink" href="#categorical-data" title="Link to this heading">¶</a></h3>
+<p>Categorical data is handled, but it is handled crudely. For example, optimization metrics do not currently include any categorical accuracy metrics.
+For categorical data that has a meaningful order (ie ‘low’, ‘medium’, ‘high’) it is best for the user to encode that data before passing it in,
+thus properly capturing the relative sequence (ie ‘low’=1, ‘medium’=2, ‘high’=3).</p>
+</section>
+<section id="custom-and-unusual-frequencies">
+<h3>Custom and Unusual Frequencies<a class="headerlink" href="#custom-and-unusual-frequencies" title="Link to this heading">¶</a></h3>
+<p>Data must be coercible to a regular frequency. It is recommended the frequency be specified as a datetime offset as per pandas documentation: <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects">https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects</a>
+Some models will support a more limited range of frequencies.</p>
+</section>
+<section id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Link to this heading">¶</a></h3>
+<p>Constraints are very useful in situations where modelling has, well constraints.
+These are upper or lower bounds (either absolute or relative to history) that the data will not cross.
+These are applied during cross validation as well as output on the immediate predition from the models.
+For a simple example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">constraint</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;constraints&quot;</span><span class="p">:</span> <span class="p">[</span>
+<span class="p">{</span><span class="c1"># don&#39;t go below zero</span>
+    <span class="s2">&quot;constraint_method&quot;</span><span class="p">:</span> <span class="s2">&quot;absolute&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;constraint_value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># can also be an array or Series</span>
+    <span class="s2">&quot;constraint_direction&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;constraint_regularization&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">},</span>
+<span class="p">]}</span>
+</pre></div>
+</div>
+<p>the slightly odd syntax, of a dictionary and then a list, is for backwards compatibility with older constraint and to allow more flexbility.</p>
+<p>As many constraints can be used as desired, and are applied in order they are in the list.
+<code class="docutils literal notranslate"><span class="pre">constraint_regularization</span></code> of 1.0 is a strict, cannot cross constraint.
+Constraint of 0.5 would allow 50% of the excess above threshold to continue to exist in the forecast.
+<code class="docutils literal notranslate"><span class="pre">bounds</span></code> determines whether this is applied to just the point forecast or to the upper and lower bounds as well.
+<code class="docutils literal notranslate"><span class="pre">constraint_method</span></code> and <code class="docutils literal notranslate"><span class="pre">constraint_value</span></code> are the most variable, with value being able to take a dictionary of args in many cases.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">constraint</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;constraints&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>  <span class="c1"># don&#39;t exceed historic max</span>
+        <span class="s2">&quot;constraint_method&quot;</span><span class="p">:</span> <span class="s2">&quot;quantile&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_value&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_direction&quot;</span><span class="p">:</span> <span class="s2">&quot;upper&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_regularization&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>  <span class="c1"># don&#39;t exceed 2% growth by end of forecast horizon</span>
+        <span class="s2">&quot;constraint_method&quot;</span><span class="p">:</span> <span class="s2">&quot;slope&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;slope&quot;</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span> <span class="s2">&quot;window&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;window_agg&quot;</span><span class="p">:</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">},</span>
+        <span class="s2">&quot;constraint_direction&quot;</span><span class="p">:</span> <span class="s2">&quot;upper&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_regularization&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+        <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>  <span class="c1"># don&#39;t go below the last 10 values - 10%</span>
+        <span class="s2">&quot;constraint_method&quot;</span><span class="p">:</span> <span class="s2">&quot;last_window&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;window&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">},</span>
+        <span class="s2">&quot;constraint_direction&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_regularization&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>  <span class="c1"># don&#39;t go below historic min  - 1 st dev</span>
+        <span class="s2">&quot;constraint_method&quot;</span><span class="p">:</span> <span class="s2">&quot;stdev_min&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_value&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_direction&quot;</span><span class="p">:</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_regularization&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>  <span class="c1"># don&#39;t go above historic mean  + 3 st devs, soft limit</span>
+        <span class="s2">&quot;constraint_method&quot;</span><span class="p">:</span> <span class="s2">&quot;stdev&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_value&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_direction&quot;</span><span class="p">:</span> <span class="s2">&quot;upper&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_regularization&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>  <span class="c1"># use a log curve shaped by the historic min/max growth rate to limit</span>
+        <span class="s2">&quot;constraint_method&quot;</span><span class="p">:</span> <span class="s2">&quot;historic_growth&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;threshold&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="s1">&#39;window&#39;</span><span class="p">:</span> <span class="mi">360</span><span class="p">},</span>
+        <span class="s2">&quot;constraint_direction&quot;</span><span class="p">:</span> <span class="s2">&quot;upper&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_regularization&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>  <span class="c1"># like slope but steps</span>
+        <span class="s1">&#39;constraint_method&#39;</span><span class="p">:</span> <span class="s1">&#39;historic_diff&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;constraint_direction&#39;</span><span class="p">:</span> <span class="s1">&#39;upper&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;constraint_regularization&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s1">&#39;constraint_value&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s1">&#39;bounds_only&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;fillna&#39;</span><span class="p">:</span> <span class="kc">None</span>
+     <span class="p">},</span>
+    <span class="p">{</span>  <span class="c1"># flattens out series, regardless</span>
+        <span class="s2">&quot;constraint_method&quot;</span><span class="p">:</span> <span class="s2">&quot;dampening&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;constraint_value&quot;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
+        <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},]</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>Constraints are extremely useful in automated forecasting. This is because it is almost impossible not to generate at least a few “bad” forecasts, due to bad data, volatile data, short data, etc.
+Constraints can help assure that truly “ridiculous” forecasts are not generated.</p>
+</section>
+</section>
+<section id="using-the-transformers-independently">
+<h2>Using the Transformers independently<a class="headerlink" href="#using-the-transformers-independently" title="Link to this heading">¶</a></h2>
+<p>The transformers expect data only in the <code class="docutils literal notranslate"><span class="pre">wide</span></code> shape with ascending date.
+The simplest way to access them is through the <a class="reference external" href="https://winedarksea.github.io/AutoTS/build/html/source/autots.tools.html#autots.tools.transform.GeneralTransformer">GeneralTransformer</a>.
+This takes dictionaries containing strings of the desired transformers and parameters.</p>
+<p>Inverse_transforms get confusing. It can be necessary to inverse_transform the data to get predictions back to a usable space.
+Some inverse_transformer only work on ‘original’ or ‘forecast’ data immediately following the training period.
+The DifferencedTransformer is one example.
+It can take the last N value of the training data to bring forecast data back to original space, but will not work for just ‘any’ future period unconnected to training data.
+Some transformers (mostly the smoothing filters like <code class="docutils literal notranslate"><span class="pre">bkfilter</span></code>) cannot be inversed at all, but transformed values are close to original values.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autots.tools.transform</span> <span class="kn">import</span> <span class="n">transformer_dict</span><span class="p">,</span> <span class="n">DifferencedTransformer</span>
+<span class="kn">from</span> <span class="nn">autots</span> <span class="kn">import</span> <span class="n">load_monthly</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available transformers are: </span><span class="si">{</span><span class="n">transformer_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">load_monthly</span><span class="p">(</span><span class="n">long</span><span class="o">=</span><span class="n">long</span><span class="p">)</span>
+
+<span class="c1"># some transformers tolerate NaN, and some don&#39;t...</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">trans</span> <span class="o">=</span> <span class="n">DifferencedTransformer</span><span class="p">()</span>
+<span class="n">df_trans</span> <span class="o">=</span> <span class="n">trans</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_trans</span><span class="o">.</span><span class="n">tail</span><span class="p">())</span>
+
+<span class="c1"># trans_method is not necessary for most transformers</span>
+<span class="n">df_inv_return</span> <span class="o">=</span> <span class="n">trans</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">df_trans</span><span class="p">,</span> <span class="n">trans_method</span><span class="o">=</span><span class="s2">&quot;original&quot;</span><span class="p">)</span>  <span class="c1"># forecast for future data</span>
+</pre></div>
+</div>
+<section id="note-on-regression-models">
+<h3>Note on ~Regression Models<a class="headerlink" href="#note-on-regression-models" title="Link to this heading">¶</a></h3>
+<p>The Regression models are WindowRegression, RollingRegression, MultivariateRegression, and DatepartRegression.
+They are all different ways of reshaping the time series into X and Y for traditional ML and Deep Learning approaches.
+All draw from the same potential pool of models, mostly sklearn and tensorflow models.</p>
+<ul class="simple">
+<li><p>DatepartRegression is where X is simply the date features, and Y are the time series values for that date.</p></li>
+<li><p>WindowRegression takes an <code class="docutils literal notranslate"><span class="pre">n</span></code> preceeding data points as X to predict the future value or values of the series.</p></li>
+<li><p>RollingRegression takes all time series and summarized rolling values of those series in one massive dataframe as X. Works well for a small number of series but scales poorly.</p></li>
+<li><p>MultivariateRegression uses the same rolling features as above, but considers them one at a time, features for series <code class="docutils literal notranslate"><span class="pre">i</span></code> are used to predict next step for series <code class="docutils literal notranslate"><span class="pre">i</span></code>, with a model trained on all data from all series. This model is now often called by the community a “global forecasting ML model”.</p></li>
+</ul>
+<p>Currently <code class="docutils literal notranslate"><span class="pre">MultivariateRegression</span></code> has the (slower) option to utilize a stock GradientBoostingRegressor with quantile loss for probabilistic estimates, while others utilize point to probabilistic estimates.</p>
+</section>
+</section>
+<section id="id9">
+<h2>Models<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Model</p></th>
+<th class="head"><p>Dependencies</p></th>
+<th class="head"><p>Optional Dependencies</p></th>
+<th class="head"><p>Probabilistic</p></th>
+<th class="head"><p>Multiprocessing</p></th>
+<th class="head"><p>GPU</p></th>
+<th class="head"><p>Multivariate</p></th>
+<th class="head"><p>Experimental</p></th>
+<th class="head"><p>Use Regressor</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ConstantNaive</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>LastValueNaive</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>AverageValueNaive</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>SeasonalNaive</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>GLS</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>GLM</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td></td>
+<td><p>joblib</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>ETS - Exponential Smoothing</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td></td>
+<td><p>joblib</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>UnobservedComponents</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>joblib</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>ARIMA</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>joblib</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>VARMAX</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>DynamicFactor</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>DynamicFactorMQ</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>VECM</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>VAR</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>Theta</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>joblib</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ARDL</p></td>
+<td><p>statsmodels</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>joblib</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>FBProphet</p></td>
+<td><p>prophet</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>joblib</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>GluonTS</p></td>
+<td><p>gluonts, mxnet</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>yes</p></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>RollingRegression</p></td>
+<td><p>sklearn</p></td>
+<td><p>lightgbm, tensorflow</p></td>
+<td></td>
+<td><p>sklearn</p></td>
+<td><p>some</p></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>WindowRegression</p></td>
+<td><p>sklearn</p></td>
+<td><p>lightgbm, tensorflow</p></td>
+<td></td>
+<td><p>sklearn</p></td>
+<td><p>some</p></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>DatepartRegression</p></td>
+<td><p>sklearn</p></td>
+<td><p>lightgbm, tensorflow</p></td>
+<td></td>
+<td><p>sklearn</p></td>
+<td><p>some</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>MultivariateRegression</p></td>
+<td><p>sklearn</p></td>
+<td><p>lightgbm, tensorflow</p></td>
+<td><p>True</p></td>
+<td><p>sklearn</p></td>
+<td><p>some</p></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>PreprocessingRegression</p></td>
+<td><p>sklearn</p></td>
+<td></td>
+<td><p>False</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>Univariate/MultivariateMotif</p></td>
+<td><p>scipy.distance.cdist</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>joblib</p></td>
+<td></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SectionalMotif</p></td>
+<td><p>scipy.distance.cdist</p></td>
+<td><p>sklearn</p></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>MetricMotif, SeasonalityMotif</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>BallTreeMultivariateMotif</p></td>
+<td><p>sklearn, scipy</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>NVAR</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>blas/lapack</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>RRVAR, MAR, TMF</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>LATC</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>PytorchForecasting</p></td>
+<td><p>pytorch-forecasting</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>pytorch</p></td>
+<td><p>yes</p></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ARCH</p></td>
+<td><p>arch</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>joblib</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>Cassandra</p></td>
+<td><p>scipy</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>KalmanStateSpace</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>FFT</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>DMD</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>BasicLinearModel</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>TiDE</p></td>
+<td><p>tensorflow</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>yes</p></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>NeuralForecast</p></td>
+<td><p>NeuralForecast</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>yes</p></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>TVVAR</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>BallTreeRegressionMotif</p></td>
+<td><p>sklearn</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>joblib</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>PreprocessingExperts</p></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>MambaSSM</p></td>
+<td><p>pytorch</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>yes</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>pMLP</p></td>
+<td><p>pytorch</p></td>
+<td></td>
+<td><p>True</p></td>
+<td></td>
+<td><p>yes</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>MotifSimulation</p></td>
+<td><p>sklearn.metrics.pairwise</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>joblib</p></td>
+<td></td>
+<td><p>True</p></td>
+<td><p>True</p></td>
+<td><p>True</p></td>
+</tr>
+</tbody>
+</table>
+<p><em>nyi = not yet implemented</em></p>
+<ul class="simple">
+<li><p>deprecated models are not actively maintained but updates may be requested in issues</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/autots_logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">Automated Forecasting</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=winedarksea&repo=autots&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Intro</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#autots">AutoTS</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#extended-tutorial">Extended Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deployment-and-template-import-export">Deployment and Template Import/Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-and-dependency-versioning">Installation and Dependency Versioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#caveats-and-advice">Caveats and Advice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id8">Simulation Forecasting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#event-risk-forecasting-and-anomaly-detection">Event Risk Forecasting and Anomaly Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-transformers-independently">Using the Transformers independently</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id9">Models</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">autots</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="intro.html" title="previous chapter">Intro</a></li>
+      <li>Next: <a href="modules.html" title="next chapter">autots</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2026, Colin Catlin.
+      
+      |
+      <a href="../_sources/source/tutorial.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

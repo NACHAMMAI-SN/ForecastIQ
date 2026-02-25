@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Series Forecast</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <header class="text-center mb-5">
+      <h1 class="display-4 fw-bold">Time Series Forecast</h1>
+      <p class="lead text-muted">Automated Model Selection & Forecasting Platform</p>
+    </header>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow rounded-3 border-0 mb-4">
+          <div class="card-body p-4">
+            <h5 class="card-title mb-4">Upload data</h5>
+            <form action="/predict-ui" method="post" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label for="files" class="form-label">CSV file(s) or folder</label>
+                <input type="file" class="form-control" id="files" name="files" accept=".csv" multiple>
+                <div class="form-text">Select one or more CSV files, or use the folder picker below.</div>
+              </div>
+              <div class="mb-3">
+                <label for="folder" class="form-label">Or upload a folder (Chrome)</label>
+                <input type="file" class="form-control" id="folder" name="files" webkitdirectory directory>
+                <div class="form-text">Choose a folder; all CSV files inside will be processed.</div>
+              </div>
+              <div class="mb-3">
+                <label for="model_speed" class="form-label">Model search speed</label>
+                <select class="form-select" id="model_speed" name="model_speed">
+                  <option value="superfast" selected>superfast</option>
+                  <option value="fast">fast</option>
+                  <option value="all">all</option>
+                </select>
+                <div class="form-text">
+                  <strong>Superfast</strong> — Quick results, limited model search.<br>
+                  <strong>Fast</strong> — Balanced speed and model diversity.<br>
+                  <strong>All</strong> — Maximum model exploration, slowest.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="prediction_mode" class="form-label">Prediction mode</label>
+                <select class="form-select" id="prediction_mode" name="prediction_mode">
+                  <option value="validation" selected>validation</option>
+                  <option value="future">future</option>
+                </select>
+                <div class="form-text">
+                  <strong>Validation Mode</strong> — Splits last 30 points as test set, shows MAPE, forecast overlaps actual.<br>
+                  <strong>Future Mode</strong> — Trains on full data and predicts next 30 future points, no MAPE.
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="output_mode" class="form-label">Multi-file output</label>
+                <select class="form-select" id="output_mode" name="output_mode">
+                  <option value="charts">charts</option>
+                  <option value="table">table</option>
+                </select>
+                <div class="form-text">When multiple files are uploaded: show a summary table or one chart per file.</div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-lg w-100">Predict</button>
+            </form>
+          </div>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger shadow-sm rounded-3" role="alert">{{ error }}</div>
+        {% endif %}
+        {% if file_errors %}
+        <div class="alert alert-warning shadow-sm rounded-3" role="alert">
+          <strong>Skipped files:</strong>
+          <ul class="mb-0 mt-1">
+            {% for msg in file_errors %}<li>{{ msg }}</li>{% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {% if result %}
+        <div class="card shadow rounded-3 border-0 mb-4">
+          <div class="card-body p-4">
+            <h5 class="card-title mb-3">Results</h5>
+            <div class="row mb-3">
+              <div class="col-md-6"><strong>Selected model:</strong> {{ result.selected_model }}</div>
+              <div class="col-md-6">
+                <strong>MAPE:</strong>
+                {% if prediction_mode == 'future' %}
+                  N/A (Future Mode)
+                {% else %}
+                  {{ result.mape if result.mape is not none else '—' }}
+                {% endif %}
+              </div>
+            </div>
+            <div class="chart">{{ result.chart_html | safe }}</div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if results_list and output_mode == 'table' %}
+        <div class="card shadow rounded-3 border-0 mb-4">
+          <div class="card-body p-4">
+            <h5 class="card-title mb-3">Results</h5>
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Selected model</th>
+                    <th>MAPE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for r in results_list %}
+                  <tr>
+                    <td>{{ r.filename }}</td>
+                    <td>{{ r.selected_model }}</td>
+                    <td>
+                      {% if prediction_mode == 'future' %}
+                        N/A
+                      {% else %}
+                        {{ r.mape if r.mape is not none else '—' }}
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if results_list and output_mode == 'charts' %}
+        {% for r in results_list %}
+        <div class="card shadow rounded-3 border-0 mb-4">
+          <div class="card-body p-4">
+            <h6 class="card-title">{{ r.filename }}</h6>
+            <p class="text-muted small mb-2">
+              Model: {{ r.selected_model }} —
+              MAPE:
+              {% if prediction_mode == 'future' %}
+                N/A
+              {% else %}
+                {{ r.mape if r.mape is not none else '—' }}
+              {% endif %}
+            </p>
+            <div class="chart">{{ r.chart_html | safe }}</div>
+          </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
