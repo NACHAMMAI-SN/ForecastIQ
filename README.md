@@ -190,7 +190,25 @@ Ensure these files are committed:
 * `meta_model.pkl`
 * `label_encoder.pkl`
 
----
+
+git clone https://github.com/NACHAMMAI-SN/ForecastIQ.git
+
+cd ForecastIQ
+
+cd autots_intelligent
+
+python -m venv venv
+
+venv\Scripts\activate
+
+pip install -r requirements.txt
+
+uvicorn api:app --host 0.0.0.0 --port 8000
+
+http://localhost:8000
+
+http://localhost:8000/docs
+
 
 ##  Training the Meta-Classifier
 
